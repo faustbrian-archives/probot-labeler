@@ -8,6 +8,25 @@ interface ILabel {
 const assignLabel = async (context: Context, levels: ILabel[], name: string): Promise<void> => {
 	const { owner, repo } = context.repo();
 
+	let issueNumber: number;
+
+	if (context.payload.pull_request) {
+		issueNumber = context.payload.pull_request.number;
+	} else if (context.payload.issue) {
+		issueNumber = context.payload.issue.number;
+	}
+
+	try {
+		await context.github.issues.addLabels({
+			owner,
+			repo,
+			issue_number: issueNumber,
+			labels: [name],
+		});
+	} catch {
+		// do nothing...
+	}
+
 	for (const level of levels) {
 		try {
 			if (level.label === name) {
@@ -17,23 +36,12 @@ const assignLabel = async (context: Context, levels: ILabel[], name: string): Pr
 			await context.github.issues.removeLabel({
 				owner,
 				repo,
-				issue_number: context.payload.pull_request.number,
+				issue_number: issueNumber,
 				name: level.label,
 			});
 		} catch {
 			// do nothing...
 		}
-	}
-
-	try {
-		await context.github.issues.addLabels({
-			owner,
-			repo,
-			issue_number: context.payload.pull_request.number,
-			labels: [name],
-		});
-	} catch {
-		// do nothing...
 	}
 };
 
@@ -95,7 +103,13 @@ const assignTopic = async (context: Context) => {
 		},
 	});
 
-	const title: string = context.payload.pull_request.title;
+	let title: string;
+
+	if (context.payload.pull_request) {
+		title = context.payload.pull_request.title;
+	} else if (context.payload.issue) {
+		title = context.payload.issue.title;
+	}
 
 	for (const label of Object.values(labeler) as ILabel[]) {
 		if (new RegExp(label.pattern).test(title)) {
@@ -105,6 +119,10 @@ const assignTopic = async (context: Context) => {
 };
 
 export = (robot: Application) => {
+	robot.on("issues.edited", assignTopic);
+	robot.on("issues.opened", assignTopic);
+	robot.on("issues.reopened", assignTopic);
+
 	robot.on("pull_request.edited", assignTopic);
 	robot.on("pull_request.opened", assignTopic);
 	robot.on("pull_request.reopened", assignTopic);
