@@ -41,55 +41,55 @@ const assignTopic = async (context: Context) => {
 	const { labeler } = await context.config("botamic.yml", {
 		labeler: {
 			feat: {
-				pattern: "feat",
+				pattern: "feat:|feat(.*):",
 				label: "Type: Feature",
 			},
 			fix: {
-				pattern: "fix",
+				pattern: "fix:|fix(.*):",
 				label: "Type: Bugfix",
 			},
 			polish: {
-				pattern: "polish",
+				pattern: "polish:|polish(.*):",
 				label: "Type: Polish",
 			},
 			docs: {
-				pattern: "docs",
+				pattern: "docs:|docs(.*):",
 				label: "Type: Documentation",
 			},
 			style: {
-				pattern: "style",
+				pattern: "style:|style(.*):",
 				label: "Type: Style",
 			},
 			refactor: {
-				pattern: "refactor",
+				pattern: "refactor:|refactor(.*):",
 				label: "Type: Refactor",
 			},
 			perf: {
-				pattern: "perf",
+				pattern: "perf:|perf(.*):",
 				label: "Type: Performance",
 			},
 			test: {
-				pattern: "test",
+				pattern: "test:|test(.*):",
 				label: "Type: Test",
 			},
 			workflow: {
-				pattern: "workflow",
+				pattern: "workflow:|workflow(.*):",
 				label: "Type: Workflow",
 			},
 			ci: {
-				pattern: "ci",
+				pattern: "ci:|ci(.*):",
 				label: "Type: Continuous Integration",
 			},
 			chore: {
-				pattern: "chore",
+				pattern: "chore:|chore(.*):",
 				label: "Type: Chore",
 			},
 			types: {
-				pattern: "types",
+				pattern: "types:|types(.*):",
 				label: "Type: Types",
 			},
 			release: {
-				pattern: "release",
+				pattern: "release:|release(.*):",
 				label: "Type: Release",
 			},
 		},
