@@ -1,4 +1,5 @@
 import { Application, Context } from "probot";
+import getConfig from "probot-config";
 
 interface ILabel {
 	pattern: string;
@@ -46,7 +47,7 @@ const assignLabel = async (context: Context, levels: ILabel[], name: string): Pr
 };
 
 const assignTopic = async (context: Context) => {
-	const { labeler } = await context.config("botamic.yml", {
+	const { labeler } = await getConfig(context, "botamic.yml", {
 		labeler: {
 			feat: {
 				pattern: "feat:|feat(.*):",
