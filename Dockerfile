@@ -1,6 +1,6 @@
 FROM node:alpine
 
-LABEL "com.github.actions.name"="labeler"
+LABEL "com.github.actions.name"="botamic-labeler"
 LABEL "com.github.actions.description"="A GitHub App built with Probot that assigns rule-based labels."
 LABEL "com.github.actions.icon"="code"
 LABEL "com.github.actions.color"="gray-dark"
