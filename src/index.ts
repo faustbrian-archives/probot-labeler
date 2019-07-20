@@ -1,10 +1,6 @@
 import { Application, Context } from "probot";
-import getConfig from "probot-config";
-
-interface ILabel {
-	pattern: string;
-	label: string;
-}
+import { ILabel } from "./interfaces";
+import { loadConfig } from "./services/config";
 
 const assignLabel = async (context: Context, levels: ILabel[], name: string): Promise<void> => {
 	const { owner, repo } = context.repo();
@@ -47,63 +43,6 @@ const assignLabel = async (context: Context, levels: ILabel[], name: string): Pr
 };
 
 const assignTopic = async (context: Context) => {
-	const { labeler } = await getConfig(context, "botamic.yml", {
-		labeler: {
-			feat: {
-				pattern: "feat:|feat(.*):",
-				label: "Type: Feature",
-			},
-			fix: {
-				pattern: "fix:|fix(.*):",
-				label: "Type: Bugfix",
-			},
-			polish: {
-				pattern: "polish:|polish(.*):",
-				label: "Type: Polish",
-			},
-			docs: {
-				pattern: "docs:|docs(.*):",
-				label: "Type: Documentation",
-			},
-			style: {
-				pattern: "style:|style(.*):",
-				label: "Type: Style",
-			},
-			refactor: {
-				pattern: "refactor:|refactor(.*):",
-				label: "Type: Refactor",
-			},
-			perf: {
-				pattern: "perf:|perf(.*):",
-				label: "Type: Performance",
-			},
-			test: {
-				pattern: "test:|test(.*):",
-				label: "Type: Test",
-			},
-			workflow: {
-				pattern: "workflow:|workflow(.*):",
-				label: "Type: Workflow",
-			},
-			ci: {
-				pattern: "ci:|ci(.*):",
-				label: "Type: Continuous Integration",
-			},
-			chore: {
-				pattern: "chore:|chore(.*):",
-				label: "Type: Chore",
-			},
-			types: {
-				pattern: "types:|types(.*):",
-				label: "Type: Types",
-			},
-			release: {
-				pattern: "release:|release(.*):",
-				label: "Type: Release",
-			},
-		},
-	});
-
 	let title: string;
 
 	if (context.payload.pull_request) {
@@ -111,6 +50,8 @@ const assignTopic = async (context: Context) => {
 	} else if (context.payload.issue) {
 		title = context.payload.issue.title;
 	}
+
+	const labeler = await loadConfig(context);
 
 	for (const label of Object.values(labeler) as ILabel[]) {
 		if (new RegExp(label.pattern).test(title)) {
@@ -120,11 +61,6 @@ const assignTopic = async (context: Context) => {
 };
 
 export = (robot: Application) => {
-	robot.on("issues.edited", assignTopic);
-	robot.on("issues.opened", assignTopic);
-	robot.on("issues.reopened", assignTopic);
-
-	robot.on("pull_request.edited", assignTopic);
-	robot.on("pull_request.opened", assignTopic);
-	robot.on("pull_request.reopened", assignTopic);
+	robot.on(["issues.edited", "issues.opened", "issues.reopened"], assignTopic);
+	robot.on(["pull_request.edited", "pull_request.opened", "pull_request.reopened"], assignTopic);
 };
